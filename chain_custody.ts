@@ -11,25 +11,29 @@ describe("chain-custody", () => {
   const program = anchor.workspace.ChainCustody as Program<ChainCustody>;
 
   it("Is initialized!", async () => {
-    // 1) Generate a new Keypair for the Material account
     const materialKeypair = Keypair.generate();
 
-    // 2) Call initializeMaterial with that account
-    const materialId = "MatA123";
+    // 1) Initialize material
     await program.methods
-      .initializeMaterial(materialId)
+      .initializeMaterial("MatA123")
       .accounts({
-        materialAccount: materialKeypair.publicKey,           // <— provide it here
-        initializer:        provider.wallet.publicKey,
-        systemProgram:      SystemProgram.programId,
+        materialAccount: materialKeypair.publicKey,
+        initializer:      provider.wallet.publicKey,
+        systemProgram:    SystemProgram.programId,
       })
-      .signers([materialKeypair])                             // <— and sign for it
+      .signers([materialKeypair])
       .rpc();
+
+    // 2) Fetch and assert
+    const account = await program.account.material.fetch(materialKeypair.publicKey);
+    assert.ok(account.currentHolder.equals(provider.wallet.publicKey));
+    assert.equal(account.lastSequence.toNumber(), 0);
+  });
 
   it("Transfers custody", async () => {
     const materialKeypair = Keypair.generate();
 
-    // 1) initialize
+    // 1) Initialize a new material
     await program.methods
       .initializeMaterial("MatB456")
       .accounts({
@@ -40,7 +44,7 @@ describe("chain-custody", () => {
       .signers([materialKeypair])
       .rpc();
 
-    // 2) transfer
+    // 2) Perform the transfer to a new holder
     const newHolder = Keypair.generate();
     await program.methods
       .transferMaterial(newHolder.publicKey)
@@ -50,9 +54,9 @@ describe("chain-custody", () => {
       })
       .rpc();
 
-    // 3) Fetch the on‑chain account and assert its state
+    // 3) Fetch and assert transfer
     const account = await program.account.material.fetch(materialKeypair.publicKey);
-    assert.ok(account.currentHolder.equals(provider.wallet.publicKey));
-    assert.equal(account.lastSequence.toNumber(), 0);
+    assert.ok(account.currentHolder.equals(newHolder.publicKey));
+    assert.equal(account.lastSequence.toNumber(), 1);
   });
 });
