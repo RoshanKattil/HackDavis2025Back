@@ -1,0 +1,164 @@
+{
+  "address": "8ZKteuY8Ro67u6G9ySTmNA1URo9KFjAS6iPoNQKBjrDN",
+  "metadata": {
+    "name": "chain_custody",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "material_account",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "initializer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "material_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "initialize_material",
+      "docs": [
+        "Initialize a new Material record, with the signer as the initial holder."
+      ],
+      "discriminator": [
+        46,
+        123,
+        191,
+        214,
+        6,
+        240,
+        35,
+        38
+      ],
+      "accounts": [
+        {
+          "name": "material_account",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "initializer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "material_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "transfer_material",
+      "docs": [
+        "Transfer custody of a material to a new holder."
+      ],
+      "discriminator": [
+        200,
+        224,
+        212,
+        51,
+        139,
+        13,
+        236,
+        53
+      ],
+      "accounts": [
+        {
+          "name": "material_account",
+          "writable": true
+        },
+        {
+          "name": "current_holder",
+          "signer": true,
+          "relations": [
+            "material_account"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_holder",
+          "type": "pubkey"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Material",
+      "discriminator": [
+        160,
+        177,
+        196,
+        114,
+        114,
+        46,
+        54,
+        201
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Material",
+      "docs": [
+        "Account data: stores info about the material."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "current_holder",
+            "type": "pubkey"
+          },
+          {
+            "name": "last_sequence",
+            "type": "u64"
+          },
+          {
+            "name": "id",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
