@@ -65,7 +65,13 @@ async def _load_program(provider: Provider) -> Program:
     for acct in data.get('accounts', []):
         if 'type' not in acct and acct['name'] in type_map:
             acct['type'] = type_map[acct['name']]
-    raw = json.dumps(data)
+        # Instantiate the IDL and program client
+    raw_json = json.dumps(data)
+    idl = Idl.from_json(raw_json)
+    return Program(idl, PROGRAM_ID, provider)
+
+async def _close_provider(provider: Provider):
+    await provider.connection.close()
 
 
 def solana_initialize_material(material_id: str) -> str:
